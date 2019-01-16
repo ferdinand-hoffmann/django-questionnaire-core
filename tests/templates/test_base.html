@@ -1,0 +1,18 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    <div id="content">
+        {% block content %}
+            {{ content }}
+            <form action="" method="post" enctype="multipart/form-data">
+                {{ form.as_ul }}
+            </form>
+        {% endblock %}
+    </div>
+</body>
+</html>
