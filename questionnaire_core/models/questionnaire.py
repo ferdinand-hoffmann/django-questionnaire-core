@@ -13,7 +13,7 @@ from ..forms import QuestionnaireFormBase
 from ..question_types import QuestionTypeRegistry
 
 
-def available_question_types():
+def builtin_question_types():
     for question_type in sorted(QuestionTypeRegistry.get_question_types().values(), key=lambda q: q.meta.verbose_name):
         yield (question_type.meta.name, question_type.meta.verbose_name)
 
@@ -74,7 +74,7 @@ class Questionnaire(models.Model):
 class Question(OrderedModel):
     questionnaire = models.ForeignKey(Questionnaire, related_name='questions', on_delete=models.CASCADE)
     question_text = models.CharField(max_length=5000)
-    question_type = QuestionTypeField(max_length=32, choices=available_question_types())
+    question_type = QuestionTypeField(max_length=32, choices=builtin_question_types())
     question_options = JSONField(blank=True, default=dict)
     required = models.BooleanField(default=True)
 

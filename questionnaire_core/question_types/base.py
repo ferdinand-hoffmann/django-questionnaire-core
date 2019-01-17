@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import inspect
+import string
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.template.engine import Engine
@@ -31,26 +32,37 @@ class QuestionTypeRegistry(object):
 
     @classmethod
     def get_question_type(cls, name):
-        return cls._registered_types[name]
+        try:
+            return cls._registered_types[name]
+        except KeyError:
+            return
 
 
 class Options(object):
     """Class to hold `meta` options of a question type class."""
     REQUIRED = ('name', 'verbose_name')
+    NAME_VALID_CHARS = string.ascii_lowercase + string.digits + '_'
 
     def __init__(self, cls, meta):
-        self.name = meta.get('name', None)
-        self.verbose_name = meta.get('verbose_name', None)
+        for required_option in self.REQUIRED:
+            if not meta.get(required_option, None):
+                raise AttributeError('{}.Meta missing required field "{}"'.format(cls.__name__, required_option))
+
+        if not set(self.NAME_VALID_CHARS).issuperset(set(meta.get('name'))):
+            raise ValueError(
+                'Invalid name for question type class {}: {} (valid chars: {})'.format(
+                    cls.__name__,
+                    meta.get('name'),
+                    self.NAME_VALID_CHARS,
+                )
+            )
+
+        self.name = meta.get('name')
+        self.verbose_name = meta.get('verbose_name')
         self.multiple = meta.get('multiple', False)
         self.widget_class = meta.get('widget_class', None)
         self.widget_template_name = None
         self.widget_option_template_name = None
-
-        for required_option in self.REQUIRED:
-            if not getattr(self, required_option, None):
-                raise AttributeError('{}.Meta missing required field "{}"'.format(cls.__name__, required_option))
-
-        self.cls = cls
 
         for template_key in ('template_name', 'option_template_name'):
             self.select_template(meta, template_key)
