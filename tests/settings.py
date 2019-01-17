@@ -36,6 +36,10 @@ TEMPLATES = [
     },
 ]
 
+FIXTURE_DIRS = [
+    os.path.join(APP_DIR, 'tests/fixtures')
+]
+
 MIDDLEWARE = (
 )
 
