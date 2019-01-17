@@ -9,3 +9,5 @@ python:
 install: pip install tox-travis
 script: tox
 dist: xenial
+services:
+  - postgresql
